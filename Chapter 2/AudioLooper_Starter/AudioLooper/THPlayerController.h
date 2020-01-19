@@ -29,8 +29,8 @@
 @end
 
 @interface THPlayerController : NSObject
-
 @property (nonatomic, getter = isPlaying) BOOL playing;
+@property (strong, nonatomic) NSArray *players;
 @property (weak, nonatomic) id <THPlayerControllerDelegate> delegate;
 
 // Global methods
