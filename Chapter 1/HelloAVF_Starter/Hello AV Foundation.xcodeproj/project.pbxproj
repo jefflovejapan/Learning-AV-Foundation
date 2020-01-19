@@ -142,12 +142,18 @@
 				CLASSPREFIX = TH;
 				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = "Bob McCune";
+				TargetAttributes = {
+					C441119318163B8D005C0699 = {
+						DevelopmentTeam = LD8C254XK3;
+					};
+				};
 			};
 			buildConfigurationList = C441118F18163B8D005C0699 /* Build configuration list for PBXProject "Hello AV Foundation" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -312,6 +318,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_MODULES_AUTOLINK = YES;
+				DEVELOPMENT_TEAM = LD8C254XK3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hello AV Foundation/Hello AV Foundation-Prefix.pch";
 				INFOPLIST_FILE = "Hello AV Foundation/Hello AV Foundation-Info.plist";
@@ -327,6 +334,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_MODULES_AUTOLINK = YES;
+				DEVELOPMENT_TEAM = LD8C254XK3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hello AV Foundation/Hello AV Foundation-Prefix.pch";
 				INFOPLIST_FILE = "Hello AV Foundation/Hello AV Foundation-Info.plist";
