@@ -42,29 +42,67 @@
 - (id)init {
     self = [super init];
     if (self) {
-
+        NSString *tmpDir = NSTemporaryDirectory();
+        NSString *filePath = [tmpDir stringByAppendingPathComponent:@"memo.caf"];
+        NSURL *fileURL = [NSURL fileURLWithPath:filePath];
+        NSDictionary *settings = @{
+            AVFormatIDKey: @(kAudioFormatAppleIMA4),
+            AVSampleRateKey: @44100.0f,
+            AVNumberOfChannelsKey: @1,
+            AVEncoderBitDepthHintKey: @16,
+            AVEncoderAudioQualityKey: @(AVAudioQualityMedium)
+        };
+        NSError *error;
+        self.recorder = [[AVAudioRecorder alloc] initWithURL:fileURL settings:settings error:&error];
+        if (self.recorder) {
+            self.recorder.delegate = self;
+            [self.recorder prepareToRecord];
+        } else {
+            NSLog(@"Error: %@", [error localizedDescription]);
+        }
     }
     return self;
 }
 
 - (BOOL)record {
-    return NO;
+    return [self.recorder record];
 }
 
 - (void)pause {
-
+    [self.recorder pause];
 }
 
 - (void)stopWithCompletionHandler:(THRecordingStopCompletionHandler)handler {
-
+    self.completionHandler = handler;
+    [self.recorder stop];
 }
 
 - (void)audioRecorderDidFinishRecording:(AVAudioRecorder *)recorder successfully:(BOOL)success {
-
+    if (self.completionHandler) {
+        self.completionHandler(success);
+    }
 }
 
 - (void)saveRecordingWithName:(NSString *)name completionHandler:(THRecordingSaveCompletionHandler)handler {
+    NSTimeInterval timestamp = [NSDate timeIntervalSinceReferenceDate];
+    NSString *filename = [NSString stringWithFormat:@"%@-%f.caf", name, timestamp];
+    NSString *docsDir = [self documentsDirectory];
+    NSString *destPath = [docsDir stringByAppendingPathComponent:filename];
+    NSURL *srcURL = self.recorder.url;
+    NSURL *destURL = [NSURL fileURLWithPath:destPath];
+    NSError *error;
+    BOOL success = [[NSFileManager defaultManager] copyItemAtURL:srcURL toURL:destURL error:&error];
+    if (success) {
+        handler(YES, [THMemo memoWithTitle:name url:destURL]);
+        [self.recorder prepareToRecord];
+    } else {
+        handler(NO, error);
+    }
+}
 
+- (NSString *)documentsDirectory {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    return [paths objectAtIndex:0];
 }
 
 - (THLevelPair *)levels {
