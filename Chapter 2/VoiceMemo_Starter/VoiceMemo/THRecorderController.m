@@ -34,6 +34,7 @@
 @property (strong, nonatomic) AVAudioPlayer *player;
 @property (strong, nonatomic) AVAudioRecorder *recorder;
 @property (strong, nonatomic) THRecordingStopCompletionHandler completionHandler;
+@property (strong, nonatomic) THMeterTable *meterTable;
 
 @end
 
@@ -55,11 +56,13 @@
         NSError *error;
         self.recorder = [[AVAudioRecorder alloc] initWithURL:fileURL settings:settings error:&error];
         if (self.recorder) {
+            self.recorder.meteringEnabled = YES;
             self.recorder.delegate = self;
             [self.recorder prepareToRecord];
         } else {
             NSLog(@"Error: %@", [error localizedDescription]);
         }
+        _meterTable = [[THMeterTable alloc] init];
     }
     return self;
 }
@@ -106,15 +109,34 @@
 }
 
 - (THLevelPair *)levels {
-    return nil;
+    [self.recorder updateMeters];
+    float avgPower = [self.recorder averagePowerForChannel:0];
+    float peakPower = [self.recorder peakPowerForChannel:0];
+    float linearLevel = [self.meterTable valueForPower:avgPower];
+    float linearPeak = [self.meterTable valueForPower:peakPower];
+    return [THLevelPair levelsWithLevel:linearLevel peakLevel:linearPeak];
 }
 
 - (NSString *)formattedCurrentTime {
-    return @"00:00:00";
+    NSUInteger time = (NSUInteger)self.recorder.currentTime;
+    NSInteger hours = (time / 3600);
+    NSInteger minutes = (time / 60) % 60;
+    NSInteger seconds = time % 60;
+    NSString *format = @"%02i:%02i:%02i";
+    return [NSString stringWithFormat:format, hours, minutes, seconds];
 }
 
 - (BOOL)playbackMemo:(THMemo *)memo {
-    return NO;
+    [self.player stop];
+    NSError *error;
+    self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:memo.url error:&error];
+    if (self.player) {
+        [self.player play];
+        return YES;
+    } else {
+        NSLog(@"Player init error: %@", [error localizedDescription]);
+        return NO;
+    }
 }
 
 @end
