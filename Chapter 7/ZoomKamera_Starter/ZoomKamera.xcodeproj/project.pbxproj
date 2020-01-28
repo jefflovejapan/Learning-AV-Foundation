@@ -219,12 +219,18 @@
 				CLASSPREFIX = TH;
 				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = "TapHarmonic, LLC";
+				TargetAttributes = {
+					0747407118A1434F0060A1F6 = {
+						DevelopmentTeam = LD8C254XK3;
+					};
+				};
 			};
 			buildConfigurationList = 0747406D18A1434F0060A1F6 /* Build configuration list for PBXProject "ZoomKamera" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -397,6 +403,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = LD8C254XK3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ZoomKamera/ZoomKamera-Prefix.pch";
 				INFOPLIST_FILE = "ZoomKamera/ZoomKamera-Info.plist";
@@ -412,6 +419,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = LD8C254XK3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ZoomKamera/ZoomKamera-Prefix.pch";
 				INFOPLIST_FILE = "ZoomKamera/ZoomKamera-Info.plist";

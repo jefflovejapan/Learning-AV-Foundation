@@ -36,9 +36,12 @@ static const NSString *THRampingVideoZoomFactorContext;
 
 - (BOOL)setupSessionInputs:(NSError **)error {
 
-    // Listing 7.4
-
-    return NO;
+    BOOL success = [super setupSessionInputs:error];
+    if (success) {
+        [self.activeCamera addObserver:self forKeyPath:@"videoZoomFactor" options:0 context:&THRampingVideoZoomFactorContext];
+        [self.activeCamera addObserver:self forKeyPath:@"rampingVideoZoom" options:0 context:&THRampingVideoZoomContext];
+    }
+    return success;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -46,46 +49,68 @@ static const NSString *THRampingVideoZoomFactorContext;
 						change:(NSDictionary *)change
 					   context:(void *)context {
 
-    // Listing 7.4
-
+    if (context == &THRampingVideoZoomContext) {
+        [self updateZoomingDelegate];
+    } else if (context == &THRampingVideoZoomFactorContext) {
+        if (self.activeCamera.isRampingVideoZoom) {
+            [self updateZoomingDelegate];
+        }
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
 }
 
 - (void)updateZoomingDelegate {
-
-    // Listing 7.4
-
+    CGFloat curZoomFactor = self.activeCamera.videoZoomFactor;
+    CGFloat maxZoomFactor = [self maxZoomFactor];
+    CGFloat value = log(curZoomFactor) / log(maxZoomFactor);
+    [self.zoomingDelegate rampedZoomToValue:value];
 }
 
 - (BOOL)cameraSupportsZoom {
 
-    // Listing 7.2
-
-    return NO;
+    return self.activeCamera.activeFormat.videoMaxZoomFactor > 1.0f;
 }
 
 - (CGFloat)maxZoomFactor {
 
-    // Listing 7.2
-
-    return 0.0f;
+    return MIN(self.activeCamera.activeFormat.videoMaxZoomFactor, 4.0f);
 }
 
 - (void)setZoomValue:(CGFloat)zoomValue {
 
-    // Listing 7.2
+    if (!self.activeCamera.isRampingVideoZoom) {
+        NSError *error;
+        if ([self.activeCamera lockForConfiguration:&error]) {
+            CGFloat zoomFactor = pow([self maxZoomFactor], zoomValue);
+            self.activeCamera.videoZoomFactor = zoomFactor;
+            [self.activeCamera unlockForConfiguration];
+        } else {
+            [self.delegate deviceConfigurationFailedWithError:error];
+        }
+    }
 
 }
 
 - (void)rampZoomToValue:(CGFloat)zoomValue {
-
-    // Listing 7.3
-
+    CGFloat zoomFactor = pow([self maxZoomFactor], zoomValue);
+    NSError *error;
+    if ([self.activeCamera lockForConfiguration:&error]) {
+        [self.activeCamera rampToVideoZoomFactor:zoomFactor withRate:THZoomRate];
+        [self.activeCamera unlockForConfiguration];
+    } else {
+        [self.delegate deviceConfigurationFailedWithError:error];
+    }
 }
 
 - (void)cancelZoom {
-
-    // Listing 7.3
-
+    NSError *error;
+    if([self.activeCamera lockForConfiguration:&error]) {
+        [self.activeCamera cancelVideoZoomRamp];
+        [self.activeCamera unlockForConfiguration];
+    } else {
+        [self.delegate deviceConfigurationFailedWithError:error];
+    }
 }
 
 @end
