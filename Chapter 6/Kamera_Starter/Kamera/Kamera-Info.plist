@@ -40,5 +40,7 @@
 	<string>IDGAF</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>GFYS</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>diarrhea</string>
 </dict>
 </plist>
