@@ -26,9 +26,9 @@
 #import "THCameraController.h"
 #import <AVFoundation/AVFoundation.h>
 
-@interface THCameraController () // Listing 7.7
+@interface THCameraController () <AVCaptureMetadataOutputObjectsDelegate>
 
-// Listing 7.6
+@property (strong, nonatomic) AVCaptureMetadataOutput *metadataOutput;
 
 @end
 
@@ -36,8 +36,20 @@
 
 - (BOOL)setupSessionOutputs:(NSError **)error {
 
-    // Listing 7.6
+    self.metadataOutput = [[AVCaptureMetadataOutput alloc] init];
+    if ([self.captureSession canAddOutput:self.metadataOutput]) {
+        [self.captureSession addOutput:self.metadataOutput];
+        NSArray *metadataObjectTypes = @[AVMetadataObjectTypeFace];
+        self.metadataOutput.metadataObjectTypes = metadataObjectTypes;
+        dispatch_queue_t mainQueue = dispatch_get_main_queue();
+        [self.metadataOutput setMetadataObjectsDelegate:self queue:mainQueue];
+        return YES;
+    }
 
+    if (error) {
+        NSDictionary *userInfo = @{NSLocalizedDescriptionKey: @"Failed to setup still image output"};
+        *error = [NSError errorWithDomain:THCameraErrorDomain code:THCameraErrorFailedToAddOutput userInfo:userInfo];
+    }
     return NO;
 }
 
@@ -45,8 +57,12 @@
 didOutputMetadataObjects:(NSArray *)metadataObjects
        fromConnection:(AVCaptureConnection *)connection {
 
-    // Listing 7.7
+    for (AVMetadataFaceObject *face in metadataObjects) {
+        NSLog(@"Face detected with iD: %li", (long)face.faceID);
+        NSLog(@"Face bounds: %@", NSStringFromCGRect(face.bounds));
+    }
 
+    [self.faceDetectionDelegate didDetectFaces:metadataObjects];
 }
 
 @end
