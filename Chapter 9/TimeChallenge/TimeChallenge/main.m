@@ -54,6 +54,11 @@ int main(int argc, const char * argv[]) {
     // 1) Create a new time equal to 8 seconds using the time values above and the CMTimeAdd function.
     // 2) Create a new time equal to 1 second using the time values above and the CMTimeSubtract function.
 
+    CMTime shouldBeEightSeconds = CMTimeAdd(t1, t2);
+    CMTime reallyEightSeconds = CMTimeMake(8, 1);
+    BOOL areTimesEqual = CMTIME_COMPARE_INLINE(shouldBeEightSeconds, ==, reallyEightSeconds);
+    printf("Is eightSeconds really eight seconds? %s\n", areTimesEqual ? "YES" : "NO");
+
     // Using Macros
     // Experiment using the various macros defined in CMTime.h.
     // Here's an example to get you started.
@@ -64,6 +69,11 @@ int main(int argc, const char * argv[]) {
     // 1) Print these constants to the console using the CMTimeShow function
     // 2) Use the macros CMTIME_IS_VALID and CMTIME_IS_INVALID to test their values.
     printf("Is kCMTimeZero a valid time? %s\n", CMTIME_IS_VALID(kCMTimeZero) ? "YES" : "NO");
+    printf("Is kCMTimeInvalid a valid time?: %s\n", CMTIME_IS_VALID(kCMTimeInvalid) ? "YES" : "NO");    // all 0s
+    printf("Is kCMTimeIndefinite a valid time?: %s\n", CMTIME_IS_VALID(kCMTimeIndefinite) ? "YES" : "NO");  // e.g., duration of live broadcast
+    printf("Is kCMTimePositiveInfinity a valid time?: %s\n", CMTIME_IS_VALID(kCMTimePositiveInfinity) ? "YES" : "NO");
+    printf("Is kCMTimeNegativeInfinity a valid time?: %s\n", CMTIME_IS_VALID(kCMTimeNegativeInfinity) ? "YES" : "NO");
+    printf("Is kCMTimeZero a valid time?: %s\n", CMTIME_IS_VALID(kCMTimeZero) ? "YES" : "NO");
 
 
     /*
@@ -98,6 +108,9 @@ int main(int argc, const char * argv[]) {
     // 1) Get a union of range1 and range3
     // 2) Use the CMTimeRangeContainsTimeRange on the union from step 1 to determine if it contains range2
 
+    CMTimeRange union13 = CMTimeRangeGetUnion(range1, range3);
+    BOOL isContained = CMTimeRangeContainsTimeRange(union13, range3);
+    printf("Does union of range1 and range3 contain range2? %s\n", isContained ? "YES" : "NO");
 
 
 

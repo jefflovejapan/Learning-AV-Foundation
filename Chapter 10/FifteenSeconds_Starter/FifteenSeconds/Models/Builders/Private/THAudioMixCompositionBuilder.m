@@ -45,16 +45,27 @@
 }
 
 - (id <THComposition>)buildComposition {
+    self.composition = [AVMutableComposition composition];
+    [self addCompositionTrackOfType:AVMediaTypeVideo withMediaItems:self.timeline.videos];
+    [self addCompositionTrackOfType:AVMediaTypeAudio withMediaItems:self.timeline.voiceOvers];
+    [self addCompositionTrackOfType:AVMediaTypeAudio withMediaItems:self.timeline.musicItems];
 
-    // Listing 10.4
-
-    return nil;
+    AVMutableCompositionTrack *musicTrack = [self addCompositionTrackOfType:AVMediaTypeAudio withMediaItems:self.timeline.musicItems];
+    AVAudioMix *audioMix = [self buildAudioMixWithTrack:musicTrack];
+    return [THAudioMixComposition compositionWithComposition:self.composition audioMix:audioMix];
 }
 
 - (AVAudioMix *)buildAudioMixWithTrack:(AVCompositionTrack *)track {
-
-    // Listing 10.5
-
+    THAudioItem *item = [self.timeline.musicItems firstObject];
+    if (item) {
+        AVMutableAudioMix *audioMix = [AVMutableAudioMix audioMix];
+        AVMutableAudioMixInputParameters *parameters = [AVMutableAudioMixInputParameters audioMixInputParametersWithTrack:track];
+        for (THVolumeAutomation *automation in item.volumeAutomation) {
+            [parameters setVolumeRampFromStartVolume:automation.startVolume toEndVolume:automation.endVolume timeRange:automation.timeRange];
+        }
+        audioMix.inputParameters = @[parameters];
+        return audioMix;
+    }
     return nil;
 }
 
