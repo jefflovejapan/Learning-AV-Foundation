@@ -44,15 +44,29 @@
 
 - (id <THComposition>)buildComposition {
 
-    // Listing 9.6
-
-    return nil;
+    self.composition = [AVMutableComposition composition];
+    [self addCompositionTrackOfType:AVMediaTypeVideo withMediaItems:self.timeline.videos];
+    [self addCompositionTrackOfType:AVMediaTypeAudio withMediaItems:self.timeline.voiceOvers];
+    [self addCompositionTrackOfType:AVMediaTypeAudio withMediaItems:self.timeline.musicItems];
+    return [THBasicComposition compositionWithComposition:self.composition];
 }
 
 - (void)addCompositionTrackOfType:(NSString *)mediaType
                    withMediaItems:(NSArray *)mediaItems {
 
-    // Listing 9.7
+    if (!THIsEmpty(mediaItems)) {
+        CMPersistentTrackID trackID = kCMPersistentTrackID_Invalid;
+        AVMutableCompositionTrack *compositionTrack = [self.composition addMutableTrackWithMediaType:mediaType preferredTrackID:trackID];
+        CMTime cursorTime = kCMTimeZero;
+        for (THMediaItem *item in mediaItems) {
+            if (CMTIME_COMPARE_INLINE(item.startTimeInTimeline, !=, kCMTimeInvalid)) {
+                cursorTime = item.startTimeInTimeline;
+            }
+            AVAssetTrack *assetTrack = [[item.asset tracksWithMediaType:item.mediaType] firstObject];
+            [compositionTrack insertTimeRange:item.timeRange ofTrack:assetTrack atTime:cursorTime error:nil];
+            cursorTime = CMTimeAdd(cursorTime, item.timeRange.duration);
+        }
+    }
     
 }
 

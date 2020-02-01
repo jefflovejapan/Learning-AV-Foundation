@@ -36,5 +36,9 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>cool sounds!</string>
+	<key>NSCameraUsageDescription</key>
+	<string>cameraaaaah</string>
 </dict>
 </plist>

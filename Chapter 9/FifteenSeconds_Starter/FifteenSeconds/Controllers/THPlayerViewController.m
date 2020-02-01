@@ -65,7 +65,9 @@ static const NSString *PlayerItemStatusContext;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
         self.autoplayContent = NO;
         self.playerItem = playerItem;
-        [self prepareToPlay];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self prepareToPlay];
+        });
     });
 }
 

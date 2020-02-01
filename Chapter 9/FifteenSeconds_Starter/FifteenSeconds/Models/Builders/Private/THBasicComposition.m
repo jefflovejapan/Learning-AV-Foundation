@@ -45,16 +45,13 @@
 
 - (AVPlayerItem *)makePlayable {
 
-    // Listing 9.3
-
-    return nil;
+    return [AVPlayerItem playerItemWithAsset:[self.composition copy]];
 }
 
 - (AVAssetExportSession *)makeExportable {
 
-    // Listing 9.3
-
-    return nil;
+    NSString *preset = AVAssetExportPresetHighestQuality;
+    return [AVAssetExportSession exportSessionWithAsset:[self.composition copy] presetName:preset];
 }
 
 @end

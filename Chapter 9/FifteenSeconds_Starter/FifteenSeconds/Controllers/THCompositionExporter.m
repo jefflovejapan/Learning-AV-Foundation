@@ -45,21 +45,56 @@
 
 - (void)beginExport {
 
-    // Listing 9.9
+    self.exportSession = [self.composition makeExportable];
+    self.exportSession.outputURL = [self exportURL];
+    self.exportSession.outputFileType = AVFileTypeMPEG4;
+    [self.exportSession exportAsynchronouslyWithCompletionHandler:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            AVAssetExportSessionStatus status = self.exportSession.status;
+            if (status == AVAssetExportSessionStatusCompleted) {
+                [self writeExportedVideoToAssetsLibrary];
+            } else {
+                [UIAlertView showAlertWithTitle:@"Export Failed" message:@"The rquested export failed."];
+            }
+        });
+    }];
+
+    self.exporting = YES;
+    [self monitorExportProgress];
 
 }
 
 - (void)monitorExportProgress {
 
-    // Listing 9.10
-
-    // Listing 9.11
-
+    double delayInSeconds = 0.1;
+    int64_t delta = (int64_t)delayInSeconds * NSEC_PER_SEC;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delta);
+    dispatch_after(popTime, dispatch_get_main_queue(), ^{
+        AVAssetExportSessionStatus status = self.exportSession.status;
+        if (status == AVAssetExportSessionStatusExporting) {
+            self.progress = self.exportSession.progress;
+            [self monitorExportProgress];
+        } else {
+            self.exporting = NO;
+        }
+    });
 }
 
 - (void)writeExportedVideoToAssetsLibrary {
 
-    // Listing 9.11
+    NSURL *exportURL = self.exportSession.outputURL;
+    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+    if ([library videoAtPathIsCompatibleWithSavedPhotosAlbum:exportURL]) {
+        [library writeVideoAtPathToSavedPhotosAlbum:exportURL completionBlock:^(NSURL *assetURL, NSError *error) {
+            if (error) {
+                NSString *message = @"Unable to write to Photos library";
+                [UIAlertView showAlertWithTitle:@"Write failed" message:message];
+            }
+            [[NSFileManager defaultManager]removeItemAtURL:exportURL error:nil];
+        }];
+    } else {
+        NSLog(@"Video could not be exported to the assets library");
+    }
     
 }
 
